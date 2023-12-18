@@ -29,7 +29,7 @@ class VertexGateway {
         })
     }
 
-    static async ParseResponce(response, id, values, functions, config) {
+    static async ParseResponse(response, id, values, functions, config) {
         let resend = false
         for (let i = 0; i < response[0].candidates[0].content.parts.length; i++) {
             const p = response[0].candidates[0].content.parts[i]
@@ -109,7 +109,7 @@ class VertexGateway {
     static async Send(id, values, functions, config) {
         const options = {
             hostname: `${config.location}-aiplatform.googleapis.com`,
-            path: `/v1/projects/${config.project}/locations/${config.ocation}/publishers/google/models/${config.model}:streamGenerateContent`,
+            path: `/v1/projects/${config.project}/locations/${config.location}/publishers/google/models/${config.model}:streamGenerateContent`,
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${config.token}`,
@@ -129,7 +129,7 @@ class VertexGateway {
             req.write(JSON.stringify(values))
             req.end()
         })
-        VertexGateway.ParseResponce(response, id, values, functions, config)
+        VertexGateway.ParseResponse(response, id, values, functions, config)
     }
 
 
