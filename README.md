@@ -23,6 +23,7 @@ const functions = [
 const result = await VertexGateway.Run(
   "What time is it and what date is it today?",
   functions,
+  {},
   {
     model: "gemini-pro",
     location: vertex_ai.preview.location,
