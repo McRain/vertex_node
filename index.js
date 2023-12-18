@@ -4,7 +4,7 @@ const _callbacks = {}
 let _cbId = 0
 
 class VertexGateway {
-    static async Run(text, functions = [], config) {
+    static async Run(text, functions = [],data, config) {
         const values = {
             "contents": [
                 {
@@ -25,16 +25,16 @@ class VertexGateway {
         return new Promise((resolve, reject) => {
             const cbId = _cbId++
             _callbacks[cbId] = { resolve, reject }
-            VertexGateway.Send(cbId, values, functions, config)
+            VertexGateway.Send(cbId, values, functions,data, config)
         })
     }
 
-    static async ParseResponse(response, id, values, functions, config) {
+    static async ParseResponse(response, id, values, functions,data, config) {
         let resend = false
         for (let i = 0; i < response[0].candidates[0].content.parts.length; i++) {
             const p = response[0].candidates[0].content.parts[i]
             if (p.functionCall) {
-                const funcResult = await VertexGateway.CallFuncs(p.functionCall, values, functions)
+                const funcResult = await VertexGateway.CallFuncs(p.functionCall, functions,data)
 
                 //Add rolemodel
                 let roleModel = values.contents.find(p => p.role === "model")
@@ -74,7 +74,7 @@ class VertexGateway {
             }
         }
         if (resend) {
-            VertexGateway.Send(id, values, functions, config)
+            VertexGateway.Send(id, values, functions,data,  config)
             return
         }
         let txt = ""
@@ -99,14 +99,14 @@ class VertexGateway {
         }
     }
 
-    static CallFuncs(funcData, values, functions, config) {
+    static CallFuncs(funcData, functions, data) {
         const func = functions.find(f => f.declaration.name === funcData.name)
         if (func) {
-            return func.handler(funcData.args)
+            return func.handler(funcData.args,data)
         }
     }
 
-    static async Send(id, values, functions, config) {
+    static async Send(id, values, functions,data,  config) {
         const options = {
             hostname: `${config.location}-aiplatform.googleapis.com`,
             path: `/v1/projects/${config.project}/locations/${config.location}/publishers/google/models/${config.model}:streamGenerateContent`,
@@ -129,7 +129,7 @@ class VertexGateway {
             req.write(JSON.stringify(values))
             req.end()
         })
-        VertexGateway.ParseResponse(response, id, values, functions, config)
+        VertexGateway.ParseResponse(response, id, values, functions,data,  config)
     }
 
 
