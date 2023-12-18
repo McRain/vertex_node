@@ -12,7 +12,7 @@
     "url": "git+https://github.com/McRain/vertex_node.git"
   },
   "author": "Viktor Abdulov <dev@reneos.com>",
-  "license": "Apache License",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/McRain/vertex_node/issues"
   },
